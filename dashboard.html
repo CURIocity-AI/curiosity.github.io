@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProjectName - Logged In</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+         /* General body and background styling */
+        body {
+             padding: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Smooth transition for content area changes */
+      #content {
+    transition: all 0.5s ease;
+    padding: 20px;
+    background-color: #1e293b;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+    max-height: 600px; /* Adjust the height to your preference */
+    overflow-y: auto; /* Enables vertical scrolling */
+}
+
+        /* General button transition */
+        button {
+            transition: transform 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+/* Floating Action Button */
+#quickActions {
+    position: fixed;
+    right: 20px;
+    bottom: 80px;
+    background-color: #38a169;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: white;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s ease;/*all 0.3s ease-in-out;*/
+    z-index: 20;
+}
+
+/* Zoom effect when the button is active */
+#quickActions.zoom {
+    transform: scale(1.0); /* Zoom in slightly */
+}
+
+/* Smooth transition for icon rotation when changing from "+" to "X" */
+#quickActions.x i {
+    transition: transform 0.4s ease-in-out; /* Easing for smoother rotation */
+    transform: rotate(45deg); /* Rotate the plus icon to form an X */
+}
+
+/* Button Icon Transition when hovering or active */
+#quickActions:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+/* Reset the icon transition back to '+' smoothly */
+#quickActions:not(.x) i {
+    transition: transform 0.4s ease-in-out; /* Easing for smoother transition back */
+    transform: rotate(0deg); /* Return to the plus icon */
+}
+
+/* Action Items */
+.action-items {
+    position: fixed;
+    right: 30px;
+    bottom: 142px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease-out, transform 0.5s ease-out;
+    z-index: 19;
+}
+
+.action-item {
+    background-color: #2d3748;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: white;
+    font-size: 1rem;
+    text-align: center;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.action-items.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.action-items.visible .action-item {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.action-items.visible .action-item:nth-child(1) { transition-delay: 0.65s; }
+.action-items.visible .action-item:nth-child(2) { transition-delay: 0.6s; }
+.action-items.visible .action-item:nth-child(3) { transition-delay: 0.55s; }
+.action-items.visible .action-item:nth-child(4) { transition-delay: 0.5s; }
+.action-items.visible .action-item:nth-child(5) { transition-delay: 0.45s; }
+.action-items.visible .action-item:nth-child(6) { transition-delay: 0.4s; }
+.action-items.visible .action-item:nth-child(7) { transition-delay: 0.35s; }
+
+/*stophere*/
+
+        /* Transition for smooth animations */
+        button {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+                      /* General button transition */
+        button {
+            transition: transform 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;/*all 0.3s ease;*/
+            position: relative;
+            z-index: 1;
+            background-color: transparent; /* Make the background transparent */
+            border: none;
+        }
+
+        /* Add green color highlight to active button */
+        button.active {
+            background-color: transparent; /* Transparent background */
+            box-shadow: none; /* Remove box-shadow when active */
+        }
+
+        /* Icon color change for active state */
+        button.active i {
+            color: #4CAF50; /* Change icon color to green when active */
+            animation: bounce-zoom 0.5s ease-out; /* Add bounce and zoom animation */
+        }
+
+        /* Bounce and zoom effect */
+        @keyframes bounce-zoom {
+            0% {
+                transform: scale(1) translateY(0);
+            }
+            50% {
+                transform: scale(1.2) translateY(-5px); /* Zoom in and bounce up */
+            }
+            100% {
+                transform: scale(1) translateY(0); /* Reset to normal size */
+            }
+        }
+
+        /* Tooltip styling with 3D effects */
+        .tooltip {
+            visibility: hidden;
+            position: absolute;
+            bottom: 37px;
+            left: -15px;
+            transform: translateX(-50%) scale(0.8); /* Initial scaling and positioning */
+            background-color: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Tooltip shows up with 3D effect and bounce */
+        button:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) scale(1) translateZ(10px); /* Tooltip scale to normal and with Z-axis */
+            animation: bounce-tooltip 0.3s ease-in-out; /* Bounce animation */
+        }
+
+        /* Keyframe for bounce effect on tooltip */
+        @keyframes bounce-tooltip {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* General section styling with soft 3D perspective */
+
+
+    .section-header {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+    .total-balance {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-content {
+            font-size: 1rem;
+            color: #666666;
+            line-height: 1.6;
+        }
+
+        .list-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .list-item:hover {
+            background-color: #eeeeee;
+            cursor: pointer;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Fixed bottom navigation bar */
+        nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-around;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Section Content */
+.section-content {
+    font-size: 1.2em;
+    color: #aaa;
+    margin-bottom: 30px;
+}
+
+/* Compact Grid Styles */
+.compact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 30px;
+}
+
+/* Grid Item Styles */
+.grid-item {
+    background-color: #1d1d1d; /* Darker background for a more Web3 feel */
+    padding: 20px;
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 255, 144, 0.2); /* Added shadow for depth */
+    width: 100%; /* Ensure grid item is responsive */
+    max-width: 500px; /* Maximum width for grid items */
+    margin: 0 auto; /* Center the grid item */
+    box-sizing: border-box; /* Ensures padding is included in width calculation */
+}
+
+.grid-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 25px rgba(0, 255, 144, 0.3); /* Elevated shadow on hover */
+}
+
+/* Title and Text */
+h3 {
+    font-size: 1.4em;
+    color: #fff;
+    margin-bottom: 10px;
+    font-weight: bold; /* More emphasis on the title */
+}
+
+p {
+    font-size: 1.2em;
+    color: #bbb;
+    margin-bottom: 20px; /* Added space between text and buttons */
+}
+
+/* Action Buttons Styles */
+.action-buttons {
+    display: flex;
+    justify-content: center; /* Align buttons in the center */
+    gap: 10px;
+    flex-wrap: wrap; /* Allow buttons to wrap to the next line if needed */
+    margin-top: 20px;
+}
+
+.action-button {
+    background: linear-gradient(145deg, #00ff90, #00cc73); /* Gradient effect */
+    border: none;
+    padding: 10px 15px; /* Smaller padding for the buttons */
+    border-radius: 25px;
+    color: white;
+    font-size: 1em; /* Smaller font size for better fit */
+    text-transform: uppercase; /* All text in uppercase for a more modern look */
+    letter-spacing: 1px; /* Adds space between letters */
+    box-shadow: 0 4px 8px rgba(0, 255, 144, 0.2); /* Soft shadow for 3D effect */
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s ease, background 0.2s ease;
+    white-space: nowrap; /* Prevents text from wrapping within buttons */
+}
+
+.action-button:hover {
+    background: linear-gradient(145deg, #00cc73, #00b362); /* Darker gradient on hover */
+    transform: translateY(-5px); /* Button "lift" effect on hover */
+    box-shadow: 0 6px 15px rgba(0, 255, 144, 0.3); /* More prominent shadow */
+}
+
+.action-button:active {
+    transform: translateY(2px); /* Button presses down when clicked */
+    box-shadow: 0 2px 5px rgba(0, 255, 144, 0.3); /* Subtle press effect */
+}
+
+/* For responsive layout */
+@media (max-width: 768px) {
+    .grid-item {
+        max-width: 100%; /* Take full width on smaller screens */
+        padding: 15px; /* Adjust padding for smaller screens */
+    }
+
+    .action-buttons {
+        gap: 8px; /* Smaller gap between buttons */
+    }
+
+    .action-button {
+        padding: 8px 12px; /* Smaller button padding for mobile */
+        font-size: 0.9em; /* Adjust font size for mobile */
+    }
+}
+
+
+
+   /* Profile Card Container */
+.profile-card {
+    display: flex;
+    align-items: center;
+    background-color:          background: linear-gradient(135deg, #0f172a, #1e293b);
+    padding: 10px; 
+    border-radius: 10px;
+    width: 100%;
+    justify-content: center;
+    flex-direction: row;
+}
+
+/* Profile Button */
+.profile-btn {
+    background-color: transparent; /* Remove the green circle */
+    color: white;
+    border: none;
+    padding: 0;
+    font-size: 50px; /* Increase icon size */
+    cursor: pointer;
+    margin-right: 5px; /* Space between icon and username */
+}
+
+.username-card {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: center; /* Center content vertically */
+    align-items: start; /* Center horizontally */
+    width: 100%; 
+    height: 50px; /* Set a smaller height for a compact rectangular shape */
+    margin-top: 4px;
+    margin-left: 3px;
+    background: #1e293b;
+    padding: 5px 4px; /* Add small padding to avoid cramped text */
+}
+
+.username {
+    font-size: 18px; /* Adjust font size to fit in the smaller card */
+    font-weight: bold;
+    color: white;
+    background: #1e293b;
+    text-align: center; /* Ensure the text is centered */
+    margin-bottom: 2px; /* Small space between the username and the button */
+}
+
+.user-verified { 
+    text-align: center;
+    margin: 0;
+    padding: 1px 3px; /* Adjust padding for the button */
+    background-color: #4CAF50;
+    margin-left: 20px;
+    color: white;
+    border-style: solid;
+    border-radius: 13px;
+    border-width: 1px;
+    font-size: 0.5rem; /* Slightly smaller font size for the button */
+    width: auto; /* Let the button adjust width based on content */
+}
+
+    /* Style for the badge */
+    .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background-color: red;
+        color: white;
+        font-size: 12px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 18px;
+    }
+
+    /* Adjusting button styles to ensure the badge fits nicely */
+    .relative {
+        position: relative;
+    }
+
+
+/* Example styles for active button color */
+.task-btn.active {
+    background-color: blue;
+    color: white;
+}
+
+/* Style for inactive buttons */
+.task-btn {
+    background-color: lightgray;
+    color: black;
+}
+
+/* Style for the task completion button */
+.complete-btn {
+    margin-left: 10px;
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+/* Hover effect for the complete button */
+.complete-btn:hover {
+    background-color: darkgreen;
+}
+
+
+
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+   <header class="flex items-center justify-between px-4 py-3 bg-gray-800 fixed top-0 left-0 w-full z-50">
+    <h1 class="text-lg font-bold text-white">$CURI</h1>
+    <div class="flex gap-4">
+
+<button id="notification" class="text-xl text-white relative">
+    <i class="fas fa-bell"></i>
+    <!-- Badge for notification count -->
+    <span class="notification-badge">3</span> 
+</button>
+
+<button id="profile" class="text-xl text-white relative">
+    <i class="fas fa-comment"></i>
+    <!-- Badge for notification count -->
+    <span class="notification-badge">5</span>
+</button>
+
+
+
+    </div>
+</header>
+
+
+    <!-- Floating Action Button -->
+    <button id="quickActions">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Action Items -->
+    <div id="actionItems" class="action-items">
+        <button class="action-item">Claim Airdrop</button>
+        <button class="action-item">Stake Tokens</button>
+        <button class="action-item">View Transactions</button>
+        <button class="action-item">View Tasks</button>
+        <button class="action-item">Rewards</button>
+        <button class="action-item">Profile Settings</button>
+        <button class="action-item">Logout</button>
+    </div>
+
+<!-- Bottom Navigation -->
+<nav class="flex justify-around items-center bg-gray-800 py-3 fixed bottom-0 w-full rounded-t-xl">
+    <button class="ripple" id="homeBtn" title="Home">
+        <i class="fas fa-home text-xl text-gray-300"></i>
+        <div class="tooltip">Home</div>
+    </button>
+    <button class="ripple" id="tasksBtn" title="Tasks">
+        <i class="fas fa-tasks text-xl text-gray-300"></i>
+        <div class="tooltip">Tasks</div>
+    </button>
+    <button class="ripple" id="walletBtn" title="Wallet">
+        <i class="fas fa-wallet text-xl text-gray-300"></i>
+        <div class="tooltip">Wallet</div>
+    </button>
+    <button class="ripple" id="userBtn" title="Profile">
+        <i class="fas fa-user text-xl text-gray-300"></i>
+        <div class="tooltip">Profile</div>
+    </button>
+</nav>
+
+<!-- Content Section -->
+<div id="content" class="pt-20 p-6">
+    <!-- Default content here if needed -->
+    <h1 class="section-header">Welcome to the Web3 Dashboard</h1>
+    <p class="section-content">Select an option from the navigation bar.</p>
+</div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+    const quickActionsButton = document.getElementById("quickActions");
+    const actionItems = document.getElementById("actionItems");
+    let menuVisible = false;
+
+    // Toggle the menu visibility when the quick action button is clicked
+    quickActionsButton.addEventListener("click", (e) => {
+        // Prevent the event from propagating to the document
+        e.stopPropagation();
+
+        menuVisible = !menuVisible;
+
+        // Toggle the zoom effect on the button
+        quickActionsButton.classList.toggle("zoom");
+
+        // Switch the button icon between "+" and "X"
+        if (menuVisible) {
+            quickActionsButton.classList.add("x");
+            actionItems.classList.add("visible");
+        } else {
+            quickActionsButton.classList.remove("x");
+            actionItems.classList.remove("visible");
+        }
+    });
+
+    // Hide the action items when clicking anywhere outside the button or action items
+    document.addEventListener("click", (e) => {
+        if (!quickActionsButton.contains(e.target) && !actionItems.contains(e.target)) {
+            // If the click is outside both the button and action items, hide the action items
+            if (menuVisible) {
+                menuVisible = false;
+                quickActionsButton.classList.remove("x");
+                actionItems.classList.remove("visible");
+            }
+        }
+    });
+});
+
+
+
+    </script>
+
+
+<script>
+    // JavaScript to add active class dynamically and show content based on clicked button
+    document.querySelectorAll('nav button').forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            button.classList.add('active');
+
+            // Change content based on button clicked
+            const content = document.getElementById('content');
+            switch (button.id) {
+                case 'homeBtn':
+                    content.innerHTML = `
+                        
+
+
+
+
+
+
+
+  <!-- Profile pics and username -->
+<div class="profile-card">
+    <button id="profile" class="profile-btn">
+        <i class="fas fa-user-circle"></i>
+    </button>
+    <div class="username-card">
+        <p class="username">Prosper Bassey</p>
+<button class="user-verified">✓ verified</button>
+    </div>
+</div>
+
+   
+        <!-- Total Balance Section -->
+        <div class="balance-section">
+            <h1 class="total-balance">$4,000.00</h1>
+            <p class="section-content">Overview of your Web3 dashboard, including balance, transactions, and stats.</p>
+        </div>
+
+<div class="grid-item">
+    <h3>CURI Balance</h3>
+    <p>1000 CURI</p>
+    <div class="action-buttons">
+        <button class="action-button buy">Buy</button>
+        <button class="action-button sell">Sell</button>
+        <button class="action-button receive">Receive</button>
+        <button class="action-button send">Send</button>
+    </div>
+</div>
+
+  <!-- Compact Grid with Token Prices and Functions -->
+        <div class="compact-grid">
+            <div class="grid-item">
+                <i class="fab fa-ethereum icon"></i>
+                <h3>ETH Price</h3>
+                <p>$2,000</p>
+            </div>
+            <div class="grid-item">
+                <i class="fas fa-wallet icon"></i>
+                <h3>Wallet Address</h3>
+                <p>0x1234...ABCD</p>
+            </div>
+            <div class="grid-item">
+                <i class="fab fa-bitcoin icon"></i>
+                <h3>BTC Price</h3>
+                <p>$30,000</p>
+            </div>
+            <div class="grid-item">
+                <i class="fas fa-arrow-up icon"></i>
+                <h3>Latest Transaction</h3>
+                <p>Sent 0.2 ETH</p>
+            </div>
+            <div class="grid-item">
+                <i class="fas fa-diamond icon"></i>
+                <h3>CURI Price</h3>
+                <p>$1.50</p>
+            </div>
+   
+                </div>
+        </div>
+   
+
+
+
+
+
+
+
+
+                    `;
+                    break;
+                case 'tasksBtn':
+                    content.innerHTML = `
+                       <h1 class="section-header">Tasks</h1>
+<p class="section-content">Manage your tasks by switching between pending and completed.</p>
+
+<div class="task-buttons">
+    <button id="pending-btn" class="task-btn active">Pending</button>
+    <button id="completed-btn" class="task-btn">Completed</button>
+</div>
+
+<div id="pending-tasks" class="task-list">
+    <h2>Pending Tasks</h2>
+    <ul id="pending-task-list">
+        <li class="list-item">Governance Proposal: Vote on Proposal #24 <button class="complete-btn">Complete</button></li>
+        <li class="list-item">Claim Staking Rewards: 1.2 ETH <button class="complete-btn">Complete</button></li>
+        <li class="list-item">Approve Token Swap: Approve USDT -> ETH <button class="complete-btn">Complete</button></li>
+    </ul>
+    <input type="text" id="new-task" placeholder="Add a new task">
+    <button id="add-task-btn">Add Task</button>
+</div>
+
+<div id="completed-tasks" class="task-list" style="display: none;">
+    <h2>Completed Tasks</h2>
+    <ul id="completed-task-list">
+        <!-- Completed tasks will appear here -->
+    </ul>
+</div>
+
+         `;
+                    break;
+                case 'walletBtn':
+                    content.innerHTML = `
+                            <h1 class="section-header">Wallet</h1>
+                        <p class="section-content">Your wallet and assets overview.</p>
+                        <div class="list-item">Balance: 3.5 ETH</div>
+                        <div class="list-item">ERC-20 Tokens: USDT, DAI</div>
+                        <div class="list-item">Transactions: 25 (Recent: Sent 0.2 ETH)</div>                
+
+                    `;
+                    break;
+                case 'userBtn':
+                    content.innerHTML = `
+                        <h1 class="section-header">Profile</h1>
+                        <p class="section-content">Manage your Web3 identity and profile settings.</p>
+                        <div class="list-item">Address: 0x1234...ABCD</div>
+                        <div class="list-item">Connected Networks: Ethereum, Binance Smart Chain</div>
+                        <div class="list-item">Profile: @yourUsername (Linked to GitHub)</div>
+                    `;
+                    break;
+                default:
+                    content.innerHTML = `
+                        <h1 class="section-header">Welcome to the Web3 Dashboard</h1>
+                        <p class="section-content">Select an option from the navigation bar.</p>
+                    `;
+            }
+
+            // Hide all tooltips first
+            document.querySelectorAll('.tooltip').forEach(tooltip => {
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.opacity = 0;
+                tooltip.style.transform = 'scale(0.8)';
+            });
+
+            // Show the clicked button's tooltip and hide after 3 seconds
+            const tooltip = button.querySelector('.tooltip');
+            tooltip.style.visibility = 'visible';
+            tooltip.style.opacity = 1;
+            tooltip.style.transform = 'scale(1)';
+
+            // Hide the tooltip after 3 seconds
+            setTimeout(() => {
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.opacity = 0;
+                tooltip.style.transform = 'scale(0.8)';
+            }, 3000);
+        });
+    });
+</script>
+
+<script>
+
+// Function to preview the profile picture in real-time
+function previewProfilePic(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function() {
+        const profileIcon = document.getElementById('profilePicIcon');
+        profileIcon.style.backgroundImage = `url(${reader.result})`;
+        profileIcon.style.backgroundSize = 'cover';
+        profileIcon.style.backgroundPosition = 'center';
+        profileIcon.classList.add('custom-profile-pic');
+    };
+    if (file) {
+        reader.readAsDataURL(file);
+    }
+}
+
+
+</script>
+
+<script>
+
+<script>
+    // Get references to the buttons, task lists, and other elements
+    const pendingBtn = document.getElementById('pending-btn');
+    const completedBtn = document.getElementById('completed-btn');
+    const pendingTasks = document.getElementById('pending-tasks');
+    const completedTasks = document.getElementById('completed-tasks');
+    const pendingTaskList = document.getElementById('pending-task-list');
+    const completedTaskList = document.getElementById('completed-task-list');
+    const addTaskBtn = document.getElementById('add-task-btn');
+    const newTaskInput = document.getElementById('new-task');
+
+    // Switch between pending and completed task views
+    pendingBtn.addEventListener('click', () => {
+        pendingTasks.style.display = 'block';
+        completedTasks.style.display = 'none';
+        pendingBtn.classList.add('active');
+        completedBtn.classList.remove('active');
+    });
+
+    completedBtn.addEventListener('click', () => {
+        completedTasks.style.display = 'block';
+        pendingTasks.style.display = 'none';
+        completedBtn.classList.add('active');
+        pendingBtn.classList.remove('active');
+    });
+
+    // Add a new task to the Pending section
+    addTaskBtn.addEventListener('click', () => {
+        const newTask = newTaskInput.value.trim();
+        if (newTask) {
+            const newListItem = document.createElement('li');
+            newListItem.classList.add('list-item');
+            newListItem.innerHTML = `${newTask} <button class="complete-btn">Complete</button>`;
+            pendingTaskList.appendChild(newListItem);
+            newTaskInput.value = '';  // Clear input field
+        }
+    });
+
+    // Handle task completion
+    pendingTaskList.addEventListener('click', (e) => {
+        if (e.target && e.target.classList.contains('complete-btn')) {
+            const taskItem = e.target.parentElement;
+            // Move the task to the Completed section
+            const completedTaskItem = document.createElement('li');
+            completedTaskItem.classList.add('list-item');
+            completedTaskItem.textContent = taskItem.textContent.replace(' Complete', '');  // Remove "Complete" button text
+
+            completedTaskList.appendChild(completedTaskItem);
+            // Remove the task from Pending
+            taskItem.remove();
+        }
+    });
+</script>
+
+
+</script>
+</body>
+</html>
